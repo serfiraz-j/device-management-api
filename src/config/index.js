@@ -1,22 +1,13 @@
-
 const dotenv = require('dotenv');
 
 dotenv.config();
 
-const required = [
-  'DB_HOST',
-  'DB_PORT',
-  'DB_NAME',
-  'DB_USER',
-  'DB_PASSWORD',
-];
+const required = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'];
 
 const missing = required.filter((key) => !process.env[key]);
 
 if (missing.length > 0) {
-  throw new Error(
-    `Eksik ortam değişkenleri: ${missing.join(', ')}`
-  );
+  throw new Error(`Eksik ortam değişkenleri: ${missing.join(', ')}`);
 }
 
 const port = Number(process.env.PORT || 3000);
