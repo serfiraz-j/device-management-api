@@ -1,0 +1,15 @@
+# İndirilen Node.js paketleri
+node_modules/
+
+# Gizli bilgiler ve yerel ortam ayarları
+.env
+.env.*
+!.env.example
+
+# Yerel veritabanı dosyaları
+*.db
+*.sqlite
+*.sqlite3
+
+# Log dosyaları
+*.log
