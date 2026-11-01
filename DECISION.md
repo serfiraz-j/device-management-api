@@ -89,3 +89,13 @@
 **Ödün:** SQLite'ın basit kurulum avantajından vazgeçiyoruz.
 
 **Ne zaman tekrar değerlendiririz?** Proje çok küçük, tek kullanıcılı ve sunucusuz çalışması gereken bir uygulamaya dönüşürse.
+
+### Veritabanı Tasarım Notları
+
+**Index seçimi:** `status` ve `last_seen` alanlarında filtreleme ve sıralama yapılabileceği için başlangıç index'leri oluşturuldu. Gerçek sorgu performansı `EXPLAIN ANALYZE` ile ölçülerek gereklilikleri yeniden değerlendirilecek.
+
+**UNIQUE ve index:** PostgreSQL, `serial_number` üzerindeki UNIQUE kısıtı için otomatik benzersiz index oluşturur. Ek index gerekmiyor.
+
+**Çift katmanlı validation:** Zod, API'ye gönderilen verileri doğrular. PostgreSQL'deki CHECK kısıtları ise doğrudan veritabanına yazılan hatalı verileri de engeller.
+
+**Tarih alanları:** `created_at`, kaydın ne zaman oluşturulduğunu; `updated_at`, en son ne zaman değiştirildiğini takip etmek içindir. Hata ayıklama ve değişiklikleri izleme açısından gereklidir.
