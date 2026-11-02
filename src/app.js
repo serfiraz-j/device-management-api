@@ -1,6 +1,7 @@
 const express = require('express');
 const { requestLogger } = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
+const healthRoutes = require('./routes/healthRoutes');
 
 const app = express();
 
