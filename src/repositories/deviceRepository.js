@@ -12,4 +12,31 @@ async function findById(id) {
   return result.rows[0] ?? null;
 }
 
-module.exports = { findAll, findById };
+async function create(device) {
+  // SQL sorgusu: yeni satır ekle
+  const sql = `
+    INSERT INTO devices (
+      name,
+      serial_number,
+      status,
+      battery,
+      last_seen
+    )
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *
+  `;
+
+  const values = [
+    device.name,
+    device.serialNumber,
+    device.status,
+    device.battery ?? null,
+    device.lastSeen ?? null,
+  ];
+
+  const result = await pool.query(sql, values);
+
+  return result.rows[0];
+}
+
+module.exports = { findAll, findById, create };
