@@ -1,4 +1,5 @@
 const deviceService = require('../services/deviceService');
+const { createDeviceSchema } = require('../validators/deviceValidator');
 
 async function getDevices(req, res) {
   const devices = await deviceService.listDevices();
