@@ -19,4 +19,14 @@ async function listDevices() {
   return devices.map(toDeviceDTO);
 }
 
-module.exports = { listDevices };
+async function getDeviceById(id) {
+  const device = await deviceRepository.findById(id);
+
+  if (!device) {
+    return null;
+  }
+
+  return toDeviceDTO(device);
+}
+
+module.exports = { listDevices, getDeviceById };

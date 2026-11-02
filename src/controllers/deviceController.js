@@ -6,4 +6,44 @@ async function getDevices(req, res) {
   return res.status(200).json(devices);
 }
 
-module.exports = { getDevices };
+async function getDeviceById(req, res) {
+  const rawId = req.params.id;
+
+  if (!/^[0-9]+$/.test(rawId)) {
+    return res.status(400).json({
+      error: {
+        code: 'INVALID_ID',
+        message: 'ID pozitif bir tam sayi olmali',
+        statusCode: 400,
+      },
+    });
+  }
+
+  const id = Number(rawId);
+
+  if (!Number.isSafeInteger(id) || id < 1 || id > 2147483647) {
+    return res.status(400).json({
+      error: {
+        code: 'INVALID_ID',
+        message: 'ID pozitif bir tam sayi olmali',
+        statusCode: 400,
+      },
+    });
+  }
+
+  const device = await deviceService.getDeviceById(id);
+
+  if (device == null) {
+    return res.status(404).json({
+      error: {
+        code: 'DEVICE_NOT_FOUND',
+        message: 'Cihaz bulunamadı',
+        statusCode: 404,
+      },
+    });
+  }
+
+  return res.status(200).json(device);
+}
+
+module.exports = { getDevices, getDeviceById };
