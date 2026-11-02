@@ -1,19 +1,14 @@
-
 const { z } = require('zod');
 
 const createDeviceSchema = z.strictObject({
   name: z.string().min(3).max(100),
 
-  serialNumber: z.string().min(1).regex(/^[A-Z0-9-]+$/),
+  serialNumber: z
+    .string()
+    .min(1)
+    .regex(/^[A-Z0-9-]+$/),
 
-  status: z
-    .enum([
-      'ACTIVE',
-      'INACTIVE',
-      'MAINTENANCE',
-      'DECOMMISSIONED',
-    ])
-    .default('INACTIVE'),
+  status: z.enum(['ACTIVE', 'INACTIVE', 'MAINTENANCE', 'DECOMMISSIONED']).default('INACTIVE'),
 
   battery: z.number().int().min(0).max(100).nullish(),
 
@@ -21,7 +16,3 @@ const createDeviceSchema = z.strictObject({
 });
 
 module.exports = { createDeviceSchema };
-
-
-    
-
