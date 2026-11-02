@@ -7,4 +7,6 @@ router.get('/devices', deviceController.getDevices);
 
 router.get('/devices/:id', deviceController.getDeviceById);
 
+router.post('/devices', deviceController.createDevice);
+
 module.exports = router;

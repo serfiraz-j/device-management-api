@@ -1,7 +1,6 @@
 const express = require('express');
 const { requestLogger } = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
-
 const app = express();
 
 app.use(requestLogger);
