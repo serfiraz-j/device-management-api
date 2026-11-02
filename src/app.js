@@ -6,7 +6,13 @@ const app = express();
 
 app.use(requestLogger);
 
+const healthRoutes = require('./routes/healthRoutes');
+const deviceRoutes = require('./routes/deviceRoutes');
+
 app.use(express.json());
+
+app.use(healthRoutes);
+app.use(deviceRoutes);
 
 app.use((req, res) => {
   return res.status(404).json({
