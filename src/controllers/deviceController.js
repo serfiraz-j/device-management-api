@@ -1,4 +1,5 @@
 const deviceService = require('../services/deviceService');
+const { createDeviceSchema } = require('../validators/deviceValidator');
 
 async function getDevices(req, res) {
   const devices = await deviceService.listDevices();
@@ -46,4 +47,28 @@ async function getDeviceById(req, res) {
   return res.status(200).json(device);
 }
 
-module.exports = { getDevices, getDeviceById };
+async function createDevice(req, res) {
+  const result = createDeviceSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Gecersiz cihaz verisi',
+        statusCode: 400,
+        details: result.error.issues.map((issue) => ({
+          field: issue.path.join('.'),
+          message: issue.message,
+        })),
+      },
+    });
+  }
+
+  const device = await deviceService.createDevice(result.data);
+
+  res.location(`/devices/${device.id}`);
+
+  return res.status(201).json(device);
+}
+
+module.exports = { getDevices, getDeviceById, createDevice };

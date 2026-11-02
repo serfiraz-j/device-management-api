@@ -29,4 +29,10 @@ async function getDeviceById(id) {
   return toDeviceDTO(device);
 }
 
-module.exports = { listDevices, getDeviceById };
+async function createDevice(data) {
+  const createdDevice = await deviceRepository.create(data);
+
+  return toDeviceDTO(createdDevice);
+}
+
+module.exports = { listDevices, getDeviceById, createDevice };
