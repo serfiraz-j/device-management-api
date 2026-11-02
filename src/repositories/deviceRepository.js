@@ -6,4 +6,10 @@ async function findAll() {
   return result.rows;
 }
 
-module.exports = { findAll };
+async function findById(id) {
+  const result = await pool.query('SELECT * FROM devices WHERE id = $1', [id]);
+
+  return result.rows[0] ?? null;
+}
+
+module.exports = { findAll, findById };
