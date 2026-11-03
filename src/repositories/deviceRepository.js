@@ -13,7 +13,6 @@ async function findById(id) {
 }
 
 async function create(device) {
-  // SQL sorgusu: yeni satır ekle
   const sql = `
     INSERT INTO devices (
       name,
@@ -39,4 +38,32 @@ async function create(device) {
   return result.rows[0];
 }
 
-module.exports = { findAll, findById, create };
+async function update(id, device) {
+  const sql = `
+  UPDATE devices
+  SET
+  name = $2,
+  serial_number = $3,
+  status = $4,
+  battery = $5,
+  last_seen = $6,
+  updated_at = NOW()
+  WHERE id = $1
+  RETURNING *
+  `;
+
+  const values = [
+    id,
+    device.name,
+    device.serialNumber,
+    device.status,
+    device.battery,
+    device.lastSeen,
+  ];
+
+  const result = await pool.query(sql, values);
+
+  return result.rows[0] ?? null;
+}
+
+module.exports = { findAll, findById, create, update };
