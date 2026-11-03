@@ -45,4 +45,8 @@ async function updateDevice(id, data) {
   return toDeviceDTO(updatedDevice);
 }
 
-module.exports = { listDevices, getDeviceById, createDevice, updateDevice };
+async function deleteDevice(id) {
+  return deviceRepository.remove(id);
+}
+
+module.exports = { listDevices, getDeviceById, createDevice, updateDevice, deleteDevice };

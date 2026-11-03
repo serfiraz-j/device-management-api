@@ -16,4 +16,6 @@ router.post('/devices', validate(createDeviceSchema), deviceController.createDev
 
 router.put('/devices/:id', validate(updateDeviceSchema), deviceController.updateDevice);
 
+router.delete('/devices/:id', deviceController.deleteDevice);
+
 module.exports = router;

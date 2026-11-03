@@ -66,4 +66,10 @@ async function update(id, device) {
   return result.rows[0] ?? null;
 }
 
-module.exports = { findAll, findById, create, update };
+async function remove(id) {
+  const result = await pool.query('DELETE FROM devices WHERE id = $1 RETURNING id', [id]);
+
+  return result.rowCount > 0;
+}
+
+module.exports = { findAll, findById, create, update, remove };
