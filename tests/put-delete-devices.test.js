@@ -2,8 +2,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { randomUUID } = require('node:crypto');
 
-const BASE_URL = process.env.TEST_BASE_URL || 'http://[::1]:3000';
-
+const BASE_URL =
+  process.env.TEST_BASE_URL || 'http://127.0.0.1:3000';
+  
 function newDevice() {
   return {
     name: 'Test Sensoru',
