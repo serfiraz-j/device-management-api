@@ -66,6 +66,16 @@ PostgreSQL
 
 SQL sorguları yalnızca Repository katmanında bulunur.
 
+## Architecture Decision Records
+
+Projede alınan önemli mimari kararlar:
+
+- [ADR-0001: Express Seçimi](docs/adr/0001-express.md)
+- [ADR-0002: Raw SQL Kullanımı](docs/adr/0002-raw-sql.md)
+- [ADR-0003: PostgreSQL Seçimi](docs/adr/0003-postgresql.md)
+
+Kısa karar özeti için [DECISION.md](DECISION.md) dosyasına bakabilirsiniz.
+
 ## Proje Klasör Yapısı
 
 ```text
