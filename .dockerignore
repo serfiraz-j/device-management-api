@@ -1,0 +1,23 @@
+
+# Yerel npm paketleri
+node_modules
+
+# Ortam değişkenleri ve şifreler
+.env
+.env.*
+
+# Git geçmişi
+.git
+.gitignore
+
+# Test ve dokümantasyon
+tests
+docs
+
+# Geliştirme dosyaları
+.vscode
+coverage
+*.log
+
+# Yerel veritabanı dosyaları
+*.db
