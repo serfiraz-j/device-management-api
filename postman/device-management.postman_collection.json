@@ -1,0 +1,250 @@
+{
+  "info": {
+    "name": "Device Management REST API - Integration Tests",
+    "description": "Yalnizca yerel test veritabaninda calistirin. Sirali istekler test cihazi olusturur, gunceller ve siler.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Health 200",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Health 200', () => pm.response.to.have.status(200));",
+              "pm.test('status ok', () => pm.expect(pm.response.json().status).to.eql('ok'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Liste 200",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/devices"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Liste 200', () => pm.response.to.have.status(200));",
+              "pm.test('JSON dizi', () => pm.expect(pm.response.json()).to.be.an('array'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Cihaz olustur 201",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/devices",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Newman Test Sensoru\",\n  \"serialNumber\": \"{{serialNumber}}\",\n  \"status\": \"ACTIVE\",\n  \"battery\": 70,\n  \"lastSeen\": null\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Her calistirmada benzersiz seri numarasi olustur.",
+              "const guid = pm.variables.replaceIn('{{$guid}}').toUpperCase();",
+              "pm.collectionVariables.set('serialNumber', `NEWMAN-${guid}`);",
+              "pm.collectionVariables.unset('deviceId');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('POST 201', () => pm.response.to.have.status(201));",
+              "if (pm.response.code === 201) {",
+              "  const device = pm.response.json();",
+              "  pm.collectionVariables.set('deviceId', String(device.id));",
+              "  pm.test('Seri numarasi dogru', () => pm.expect(device.serialNumber).to.eql(pm.collectionVariables.get('serialNumber')));",
+              "  pm.test('Location header var', () => pm.expect(pm.response.headers.get('Location')).to.include('/devices/'));",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Cihazi getir 200",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/devices/{{deviceId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('GET 200', () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200) {",
+              "  pm.test('ID eslesiyor', () => pm.expect(String(pm.response.json().id)).to.eql(pm.collectionVariables.get('deviceId')));",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Cihazi guncelle 200",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/devices/{{deviceId}}",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Newman Guncellenmis Sensor\",\n  \"serialNumber\": \"{{serialNumber}}\",\n  \"status\": \"MAINTENANCE\",\n  \"battery\": 40,\n  \"lastSeen\": null\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('PUT 200', () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200) {",
+              "  const device = pm.response.json();",
+              "  pm.test('Durum MAINTENANCE', () => pm.expect(device.status).to.eql('MAINTENANCE'));",
+              "  pm.test('Batarya 40', () => pm.expect(device.battery).to.eql(40));",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Eksik POST 400",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/devices",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Eksik Alan Testi\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Eksik veri 400', () => pm.response.to.have.status(400));",
+              "if (pm.response.code === 400) {",
+              "  pm.test('VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Cihazi sil 204",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/devices/{{deviceId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('DELETE 204', () => pm.response.to.have.status(204));",
+              "pm.test('Bos yanit', () => pm.expect(pm.response.text()).to.eql(''));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Silineni getir 404",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/devices/{{deviceId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('GET 404', () => pm.response.to.have.status(404));",
+              "if (pm.response.code === 404) {",
+              "  pm.test('DEVICE_NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('DEVICE_NOT_FOUND'));",
+              "}"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:3000",
+      "type": "string"
+    },
+    {
+      "key": "deviceId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "serialNumber",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
