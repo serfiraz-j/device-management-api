@@ -11,7 +11,6 @@ services:
     environment:
       NODE_ENV: production
       PORT: "3000"
-
       DB_HOST: db
       DB_PORT: "5432"
       DB_NAME: ${DB_NAME:?DB_NAME gerekli}
@@ -19,7 +18,25 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD gerekli}
 
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('node:http').get('http://127.0.0.1:3000/health', res => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+    user: node
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 
   db:
     image: postgres:18-alpine
@@ -31,8 +48,16 @@ services:
 
     volumes:
       - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-
       - postgres_data:/var/lib/postgresql
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
 
 volumes:
   postgres_data:
