@@ -1,4 +1,26 @@
+
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    ports:
+      - "127.0.0.1:3000:3000"
+
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:?DB_NAME gerekli}
+      DB_USER: ${DB_USER:?DB_USER gerekli}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD gerekli}
+
+    depends_on:
+      - db
+
   db:
     image: postgres:18-alpine
 
@@ -9,6 +31,7 @@ services:
 
     volumes:
       - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+
       - postgres_data:/var/lib/postgresql
 
 volumes:
