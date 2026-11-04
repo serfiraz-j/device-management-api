@@ -347,3 +347,9 @@ npm run format:check
 ## Lisans
 
 Projenin lisans bilgisi `package.json` dosyasında belirtilmiştir.
+
+## Contributing
+
+Projeye katkıda bulunmak için
+[CONTRIBUTING.md](CONTRIBUTING.md)
+dosyasındaki geliştirme standartlarını takip edin.
