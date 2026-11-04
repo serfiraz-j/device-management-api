@@ -3,7 +3,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { randomUUID } = require('node:crypto');
 
-const URL = 'http://[::1]:3000/devices';
+const BASE_URL =
+  process.env.TEST_BASE_URL || 'http://127.0.0.1:3000';
 
 function newSerial() {
   return `TEST-${randomUUID().toUpperCase()}`;
@@ -20,15 +21,17 @@ function validDevice() {
 }
 
 async function postDevice(data, expectedStatus, expectedCode) {
-  const response = await fetch(URL, {
+  const response = await fetch(`${BASE_URL}/devices`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(data),
   });
 
   const body = await response.json();
 
-  assert.equal(response.status, expectedStatus);
+    assert.equal(response.status, expectedStatus);
 
   if (expectedStatus === 201) {
     assert.ok(body.id > 0);
