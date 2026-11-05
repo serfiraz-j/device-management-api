@@ -12,4 +12,4 @@ node_modules/
 *.sqlite3
 
 # Log dosyaları
-*.log
+*.log*:Zone.Identifier
