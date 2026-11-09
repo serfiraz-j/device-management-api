@@ -1,10 +1,8 @@
-
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { randomUUID } = require('node:crypto');
 
-const BASE_URL =
-  process.env.TEST_BASE_URL || 'http://127.0.0.1:3000';
+const BASE_URL = process.env.TEST_BASE_URL || 'http://127.0.0.1:3000';
 
 function newSerial() {
   return `TEST-${randomUUID().toUpperCase()}`;
@@ -31,16 +29,13 @@ async function postDevice(data, expectedStatus, expectedCode) {
 
   const body = await response.json();
 
-    assert.equal(response.status, expectedStatus);
+  assert.equal(response.status, expectedStatus);
 
   if (expectedStatus === 201) {
     assert.ok(body.id > 0);
     assert.equal(body.serialNumber, data.serialNumber);
 
-    assert.equal(
-      response.headers.get('location'),
-      `/devices/${body.id}`,
-    );
+    assert.equal(response.headers.get('location'), `/devices/${body.id}`);
   } else {
     assert.equal(body.error.code, expectedCode);
     assert.equal(body.error.statusCode, expectedStatus);
@@ -88,28 +83,17 @@ test('05 - Battery null kabul edilir', async () => {
 
 test('06 - Gecerli lastSeen kabul edilir', async () => {
   const date = '2026-11-02T10:00:00Z';
-  const body = await postDevice(
-    { ...validDevice(), lastSeen: date },
-    201,
-  );
+  const body = await postDevice({ ...validDevice(), lastSeen: date }, 201);
 
   assert.equal(body.lastSeen, '2026-11-02T10:00:00.000Z');
 });
 
 test('07 - Kisa name reddedilir', async () => {
-  await postDevice(
-    { ...validDevice(), name: 'AB' },
-    400,
-    'VALIDATION_ERROR',
-  );
+  await postDevice({ ...validDevice(), name: 'AB' }, 400, 'VALIDATION_ERROR');
 });
 
 test('08 - Uzun name reddedilir', async () => {
-  await postDevice(
-    { ...validDevice(), name: 'A'.repeat(101) },
-    400,
-    'VALIDATION_ERROR',
-  );
+  await postDevice({ ...validDevice(), name: 'A'.repeat(101) }, 400, 'VALIDATION_ERROR');
 });
 
 test('09 - Eksik name reddedilir', async () => {
@@ -120,19 +104,11 @@ test('09 - Eksik name reddedilir', async () => {
 });
 
 test('10 - Kucuk harfli serial reddedilir', async () => {
-  await postDevice(
-    { ...validDevice(), serialNumber: 'test-001' },
-    400,
-    'VALIDATION_ERROR',
-  );
+  await postDevice({ ...validDevice(), serialNumber: 'test-001' }, 400, 'VALIDATION_ERROR');
 });
 
 test('11 - Bosluklu serial reddedilir', async () => {
-  await postDevice(
-    { ...validDevice(), serialNumber: 'TEST 001' },
-    400,
-    'VALIDATION_ERROR',
-  );
+  await postDevice({ ...validDevice(), serialNumber: 'TEST 001' }, 400, 'VALIDATION_ERROR');
 });
 
 test('12 - Eksik serial reddedilir', async () => {
@@ -143,43 +119,23 @@ test('12 - Eksik serial reddedilir', async () => {
 });
 
 test('13 - Gecersiz status reddedilir', async () => {
-  await postDevice(
-    { ...validDevice(), status: 'BROKEN' },
-    400,
-    'VALIDATION_ERROR',
-  );
+  await postDevice({ ...validDevice(), status: 'BROKEN' }, 400, 'VALIDATION_ERROR');
 });
 
 test('14 - Battery -1 reddedilir', async () => {
-  await postDevice(
-    { ...validDevice(), battery: -1 },
-    400,
-    'VALIDATION_ERROR',
-  );
+  await postDevice({ ...validDevice(), battery: -1 }, 400, 'VALIDATION_ERROR');
 });
 
 test('15 - Battery 101 reddedilir', async () => {
-  await postDevice(
-    { ...validDevice(), battery: 101 },
-    400,
-    'VALIDATION_ERROR',
-  );
+  await postDevice({ ...validDevice(), battery: 101 }, 400, 'VALIDATION_ERROR');
 });
 
 test('16 - Ondalikli battery reddedilir', async () => {
-  await postDevice(
-    { ...validDevice(), battery: 12.5 },
-    400,
-    'VALIDATION_ERROR',
-  );
+  await postDevice({ ...validDevice(), battery: 12.5 }, 400, 'VALIDATION_ERROR');
 });
 
 test('17 - Fazladan alan reddedilir', async () => {
-  await postDevice(
-    { ...validDevice(), admin: true },
-    400,
-    'VALIDATION_ERROR',
-  );
+  await postDevice({ ...validDevice(), admin: true }, 400, 'VALIDATION_ERROR');
 });
 
 test('18 - Duplicate serial 409 dondurur', async () => {
