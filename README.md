@@ -14,6 +14,9 @@ Node.js, Express ve PostgreSQL kullanılarak geliştirilmiş, IoT cihazlarını 
 - Merkezi hata yönetimi
 - Docker ve Docker Compose desteği
 - Node.js Test Runner ile otomatik API testleri
+- Ortak middleware ile cihaz ID doğrulama
+- Tutarlı JSON hata yanıtları için sendError yardımcı fonksiyonu
+- SIGTERM ve SIGINT sinyallerinde graceful shutdown
 
 ## Kullanılan Teknolojiler
 
@@ -88,11 +91,12 @@ device-management-api/
 │   ├── config/
 │   ├── controllers/
 │   ├── db/
-│   ├── lib/
 │   ├── middleware/
 │   ├── repositories/
 │   ├── routes/
 │   ├── services/
+│   ├── utils/
+│   │   └── sendError.js
 │   ├── validators/
 │   ├── app.js
 │   └── index.js
@@ -269,7 +273,7 @@ API, standart JSON hata yanıtları kullanır.
 {
   "error": {
     "code": "DEVICE_NOT_FOUND",
-    "message": "Cihaz bulunamadi",
+    "message": "Cihaz bulunamadı",
     "statusCode": 404
   }
 }
@@ -333,6 +337,30 @@ npm run format:check
 | `docker compose logs db` | PostgreSQL loglarını gösterir |
 | `docker compose stop` | Servisleri durdurur |
 | `docker compose down` | Container'ları kaldırır, volume'ü korur |
+
+## Graceful Shutdown
+
+API, SIGTERM ve SIGINT sinyallerini dinler.
+
+Kapanış sırasında:
+
+1. HTTP sunucusu yeni bağlantı kabul etmeyi durdurur.
+2. Devam eden HTTP isteklerinin tamamlanması beklenir.
+3. PostgreSQL bağlantı havuzu `pool.end()` ile kapatılır.
+4. Kapanış aşamaları Pino ile loglanır.
+
+Kapanışı test etmek için:
+
+```bash
+docker compose stop api
+docker compose logs --tail=30 api
+```
+
+API'yi yeniden başlatmak için:
+
+```bash
+docker compose start api
+```
 
 ## Güvenlik Yaklaşımı
 

@@ -1,4 +1,5 @@
 const deviceService = require('../services/deviceService');
+const sendError = require('../utils/sendError');
 
 async function getDevices(req, res) {
   const devices = await deviceService.listDevices();
@@ -7,40 +8,12 @@ async function getDevices(req, res) {
 }
 
 async function getDeviceById(req, res) {
-  const rawId = req.params.id;
-
-  if (!/^[0-9]+$/.test(rawId)) {
-    return res.status(400).json({
-      error: {
-        code: 'INVALID_ID',
-        message: 'ID pozitif bir tam sayi olmali',
-        statusCode: 400,
-      },
-    });
-  }
-
-  const id = Number(rawId);
-
-  if (!Number.isSafeInteger(id) || id < 1 || id > 2147483647) {
-    return res.status(400).json({
-      error: {
-        code: 'INVALID_ID',
-        message: 'ID pozitif bir tam sayi olmali',
-        statusCode: 400,
-      },
-    });
-  }
+  const id = res.locals.deviceId;
 
   const device = await deviceService.getDeviceById(id);
 
   if (device == null) {
-    return res.status(404).json({
-      error: {
-        code: 'DEVICE_NOT_FOUND',
-        message: 'Cihaz bulunamadı',
-        statusCode: 404,
-      },
-    });
+    return sendError(res, 404, 'DEVICE_NOT_FOUND', 'Cihaz bulunamadı');
   }
 
   return res.status(200).json(device);
@@ -55,82 +28,33 @@ async function createDevice(req, res) {
 }
 
 async function updateDevice(req, res) {
-  const rawId = req.params.id;
-
-  if (!/^[0-9]+$/.test(rawId)) {
-    return res.status(400).json({
-      error: {
-        code: 'INVALID_ID',
-        message: 'ID pozitif bir tam sayi olmali',
-        statusCode: 400,
-      },
-    });
-  }
-
-  const id = Number(rawId);
-
-  if (!Number.isSafeInteger(id) || id < 1 || id > 2147483647) {
-    return res.status(400).json({
-      error: {
-        code: 'INVALID_ID',
-        message: 'ID pozitif bir tam sayi olmali',
-        statusCode: 400,
-      },
-    });
-  }
+  const id = res.locals.deviceId;
 
   const device = await deviceService.updateDevice(id, req.body);
+
   if (device === null) {
-    return res.status(404).json({
-      error: {
-        code: 'DEVICE_NOT_FOUND',
-        message: 'Cihaz bulunamadi',
-        statusCode: 404,
-      },
-    });
+    return sendError(res, 404, 'DEVICE_NOT_FOUND', 'Cihaz bulunamadı');
   }
 
   return res.status(200).json(device);
 }
 
 async function deleteDevice(req, res) {
-  const rawId = req.params.id;
-
-  if (!/^[0-9]+$/.test(rawId)) {
-    return res.status(400).json({
-      error: {
-        code: 'INVALID_ID',
-        message: 'ID pozitif bir tam sayi olmali',
-        statusCode: 400,
-      },
-    });
-  }
-
-  const id = Number(rawId);
-
-  if (!Number.isSafeInteger(id) || id < 1 || id > 2147483647) {
-    return res.status(400).json({
-      error: {
-        code: 'INVALID_ID',
-        message: 'ID pozitif bir tam sayi olmali',
-        statusCode: 400,
-      },
-    });
-  }
+  const id = res.locals.deviceId;
 
   const deleted = await deviceService.deleteDevice(id);
 
   if (!deleted) {
-    return res.status(404).json({
-      error: {
-        code: 'DEVICE_NOT_FOUND',
-        message: 'Cihaz bulunamadi',
-        statusCode: 404,
-      },
-    });
+    return sendError(res, 404, 'DEVICE_NOT_FOUND', 'Cihaz bulunamadı');
   }
 
   return res.status(204).send();
 }
 
-module.exports = { getDevices, getDeviceById, createDevice, updateDevice, deleteDevice };
+module.exports = {
+  getDevices,
+  getDeviceById,
+  createDevice,
+  updateDevice,
+  deleteDevice,
+};
